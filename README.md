@@ -50,4 +50,4 @@ python -m pytest -q
 ### Parameters
 - `a = 0.75`   - Threshold-like parameter controlling excitability.
 - `b = 0.02`   - Recovery time scale.
-- `eap = 0.02` - Controls sharpness of the activation term (nonlinear gain).
+- `eps = 0.02` - Controls sharpness of the activation term (nonlinear gain).
