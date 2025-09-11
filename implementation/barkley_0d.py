@@ -5,7 +5,7 @@ and a class for the 0D model itself.
 
 """
 
-from model_template import ops
+from barkley import ops
 
 
 class Stimulation:
@@ -37,7 +37,7 @@ class Stimulation:
         return self.amplitude if self.t_start <= t < self.t_start + self.duration else 0.0
 
 
-class Model0D:
+class Barkley0D:
     """
     Model OD implementation.
 
@@ -81,7 +81,14 @@ class Model0D:
         i : int
             Current time step index.
         """
-        raise NotImplementedError("Model0D.step: implement your integration scheme (e.g., explicit Euler).")
+        self.variables["v"] += self.dt*ops.calc_dv(self.variables["v"], self.variables["u"])
+
+        self.variables["u"] += self.dt*(ops.calc_rhs(self.variables["u"],
+                                                self.variables["v"], 
+                                                self.parameters["a"], 
+                                                self.parameters["b"],
+                                                self.parameters["eps"])
+                                + sum(stim.stim(t=self.dt*i) for stim in self.stimulations))
 
     def run(self, t_max: float):
         """
