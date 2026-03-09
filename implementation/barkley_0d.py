@@ -81,14 +81,16 @@ class Barkley0D:
         i : int
             Current time step index.
         """
-        self.variables["v"] += self.dt*ops.calc_dv(self.variables["v"], self.variables["u"])
+        u_old = self.variables["u"]
+        v_old = self.variables["v"]
 
-        self.variables["u"] += self.dt*(ops.calc_rhs(self.variables["u"],
-                                                self.variables["v"], 
-                                                self.parameters["a"], 
-                                                self.parameters["b"],
-                                                self.parameters["eps"])
-                                + sum(stim.stim(t=self.dt*i) for stim in self.stimulations))
+        du = ops.calc_rhs(u_old, v_old, self.parameters["a"], self.parameters["b"], self.parameters["eps"])
+        dv = ops.calc_dv(v_old, u_old)
+
+        stim_current = sum(stim.stim(t=self.dt*i) for stim in self.stimulations)
+
+        self.variables["v"] = v_old + self.dt * dv
+        self.variables["u"] = u_old + self.dt * (du + stim_current)
 
     def run(self, t_max: float):
         """
