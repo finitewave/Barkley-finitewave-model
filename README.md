@@ -19,6 +19,8 @@ DOI: https://doi.org/10.1016/0167-2789(86)90198-1.
 python -m examples.barkley_example
 ```
 
+![Alt text](barkley_ap.png)
+
 ### How to test
 ```bash
 python -m pytest -q

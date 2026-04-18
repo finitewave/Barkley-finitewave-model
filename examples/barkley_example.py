@@ -12,16 +12,17 @@ from implementation.barkley_0d import Barkley0D, Stimulation
 
 
 stimulations = [Stimulation(t_start=0.1, duration=0.2, amplitude=1.0)]
-t_max = 100.0
+t_max = 6.0
 
 model = Barkley0D(dt=0.01, stimulations=stimulations)
 model.run(t_max=t_max)
 
-time = np.arange(0, t_max, model.dt)
-plt.plot(time, model.history['u'])
+fig = plt.figure(figsize=(10, 5))
+plt.plot(model.times, model.history['u'], lw=2)
 plt.xlabel('Time (s)')
 plt.ylabel('Membrane Potential (u)')
 plt.title('0D Model Simulation')
 plt.grid()
 plt.show()
 
+fig.savefig('barkley_ap.png', dpi=300)
