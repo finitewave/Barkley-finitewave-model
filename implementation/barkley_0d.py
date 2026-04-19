@@ -71,6 +71,8 @@ class Barkley0D:
         self.variables = ops.get_variables()
         self.parameters = ops.get_parameters()
         self.history = {s: [] for s in self.variables}
+        self.stim_history = []
+        self.times = []
 
     def step(self, i: int):
         """
@@ -81,16 +83,11 @@ class Barkley0D:
         i : int
             Current time step index.
         """
-        u_old = self.variables["u"]
-        v_old = self.variables["v"]
-
-        du = ops.calc_rhs(u_old, v_old, self.parameters["a"], self.parameters["b"], self.parameters["eps"])
-        dv = ops.calc_dv(v_old, u_old)
-
-        stim_current = sum(stim.stim(t=self.dt*i) for stim in self.stimulations)
-
-        self.variables["v"] = v_old + self.dt * dv
-        self.variables["u"] = u_old + self.dt * (du + stim_current)
+        rhs, v_new = ops.ionic_step(self.dt, **self.variables, **self.parameters)
+        stim_curr = self.dt * sum(stim.stim(t=self.dt*i) for stim in self.stimulations)
+        self.stim_history.append(stim_curr)
+        self.variables["u"] += self.dt * rhs + stim_curr
+        self.variables["v"] = v_new
 
     def run(self, t_max: float):
         """
@@ -104,5 +101,6 @@ class Barkley0D:
         n_steps = int(round(t_max/self.dt))
         for i in range(n_steps):
             self.step(i)
+            self.times.append(self.dt * i)
             for s in self.variables:
                 self.history[s].append(self.variables[s])

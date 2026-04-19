@@ -30,6 +30,34 @@ def get_parameters() -> dict[str, float]:
     return {"a": 0.75, "b": 0.02, "eps": 0.02}
 
 
+def ionic_step(dt, u, v, a, b, eps):
+    """
+    Computes the next values of the excitation and recovery variables.
+
+    Parameters
+    ----------
+    u : float
+        Current value of the excitation variable.
+    v : float
+        Current value of the recovery variable.
+    a : float
+        Parameter controlling the excitation threshold.
+    b : float
+        Parameter influencing the recovery dynamics.
+    eps : float
+        Parameter scaling the time dynamics.
+
+    Returns
+    -------
+    tuple[float, float]
+        A tuple containing the right-hand side of the model and the updated
+        value of the recovery variable.
+    """
+    rhs = calc_rhs(u, v, a, b, eps)
+    dv = calc_dv(v, u)
+    v_new = v + dt * dv
+    return rhs, v_new
+
 def calc_rhs(u, v, a, b, eps) -> float:
     """
     Computes the right-hand side of the model.
@@ -52,7 +80,7 @@ def calc_rhs(u, v, a, b, eps) -> float:
     float
         Right-hand side of the model.
     """
-    return (u*(1 - u)*(u - (v + b)/a))/eps
+    return (u * (1 - u) * (u - (v + b) / a)) / eps
 
 
 def calc_dv(v, u):
@@ -74,4 +102,4 @@ def calc_dv(v, u):
     float
         Updated value of the recovery variable.
     """
-    return (u-v)
+    return (u - v)
